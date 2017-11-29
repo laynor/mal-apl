@@ -44,7 +44,7 @@ exit:
 ∇
 
 ∇test N
-  (N∊1 2 3)/one two three
+  →(N=1 2 3)/one two three
   →other
 one:
   'one!'
@@ -61,10 +61,11 @@ exit:
 ∇
 
 ∇R←r∆tokenize S
-  i←1
+  i←0
   R←⍬
   TOK←⍬
 start:
+  i←i+1
   →(i > ⍴S)/appendTOKandExit
   C←S[i]
   →(C ∊ "'`&@~[](){}")/appendTokenAndChar
@@ -73,12 +74,10 @@ start:
   →numberOrSymbol
 whitespace:
   →(TOK≢⍬)/appendToken
-  i←i+1
   →start
 appendToken:
   R←R append TOK
   TOK←⍬
-  i←i+1
   →start
 appendTokenAndChar:
   →(TOK≡⍬)/appendChar
@@ -86,13 +85,27 @@ appendTokenAndChar:
   TOK←⍬
 appendChar:
   R←R append 1⍴C
-  i←i+1
   →start
 numberOrSymbol:
   TOK←TOK,C
-  i←i+1
   →start
 string:
+  STR←'"'
+stringContent:
+  i←i+1
+  →(S[i] = '\')/readEscape
+  →(S[i] = '"')/endString
+  STR←STR,S[i]
+  →stringContent
+readEscape:
+  i←i+1
+  'reading escape' S[i]
+  C←1↑(S[i] = 'rntba')/(⎕ucs 13 10 9 8 7)
+  STR←STR,C
+  →stringContent
+endString:
+  R←R append STR,'"'
+  →start
 appendTOKandExit:
   →(TOK≡⍬)/exit
   R←R append TOK
