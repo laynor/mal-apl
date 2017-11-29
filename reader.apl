@@ -100,7 +100,8 @@ stringContent:
 readEscape:
   i←i+1
   'reading escape' S[i]
-  C←1↑(S[i] = 'rntba')/(⎕ucs 13 10 9 8 7)
+  C←1↑(S[i] = 'rntba"\')/(⎕ucs 13 10 9 8 7 34 92)
+  'read' C
   STR←STR,C
   →stringContent
 endString:
